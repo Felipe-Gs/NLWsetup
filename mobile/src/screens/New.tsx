@@ -26,10 +26,10 @@ export function New(){
                     Criar habito
                 </Text>
                 <Text className="mt-6 text-white font-semibold text-base">
-                    Qual seu comprometimento
+                    Qual seu comprometimento?
                 </Text>
 
-                <TextInput placeholderTextColor={colors.zinc[400]} placeholder="Exercicios, dormir bem, etc..." className="h-12 pl-4 rounded-lg mt-3 bg-zinc-800 text-white focus:border-green-600 border-2"/>
+                <TextInput placeholderTextColor={colors.zinc[400]} placeholder="Exercicios, dormir bem, etc..." className="h-12 pl-4 rounded-lg mt-3 bg-zinc-900 text-white focus:border-green-600 border-2 border-zinc-800 "/>
                 
                 <Text className="font-semibold mt-4 mb-3 text-white text-base">Qual a recorrência?</Text>
                 {
