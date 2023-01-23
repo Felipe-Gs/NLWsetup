@@ -1,13 +1,10 @@
 import dayjs from "dayjs"
 import { FastifyInstance } from "fastify"
-import { request } from "http"
-import { parse } from "path"
 import {z} from 'zod'
-import { date } from "zod/lib"
 import { prisma } from "./lib/prisma"
 
 
-export async function appRoutes(app: FastifyInstance){
+export async function AppRoutes(app: FastifyInstance){
     app.post('/habits', async (request) => {
         const createHabitBody = z.object({
             title: z.string(),
@@ -22,9 +19,9 @@ export async function appRoutes(app: FastifyInstance){
                 title, 
                 created_at: today,
                 weekDays: {
-                    create: weekDays.map(weekDay =>{
+                    create: weekDays.map(day =>{
                         return{
-                            week_day: weekDay,
+                            week_day: day,
                         }
                     })
                 }
@@ -68,6 +65,7 @@ export async function appRoutes(app: FastifyInstance){
 
         return{
             possibleHabits,
+            completedHabits
         }
     })
 
@@ -88,7 +86,7 @@ export async function appRoutes(app: FastifyInstance){
         if(!day){
             day = await prisma.day.create({
                 data:{
-                    date:today,
+                    date:today
                 }
             })
         }
@@ -133,7 +131,7 @@ export async function appRoutes(app: FastifyInstance){
                         cast(count(*) as float) 
                     FROM day_habits DH
                     WHERE DH.habit_id = D.id
-                )as completed
+                )as completed,
                 (
                     SELECT
                         cast(count(*) as float) 
