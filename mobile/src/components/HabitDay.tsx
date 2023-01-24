@@ -13,16 +13,17 @@ export const DAY_SIZE = (Dimensions.get('screen').width / WEEK_DAYS) - (SCREE_HO
 interface Props extends TouchableOpacityProps{
     amountOfHabits?: number;
     amountCompleted?: number;
-    date: Date
+    date: Date;
 };
 
 export function HabitDay({ amountOfHabits = 0, amountCompleted = 0, date,  ...rest}:Props){
     const amountAccompplishedPercentage = amountOfHabits > 0 ? generateProgressPercentage(amountOfHabits, amountCompleted): 0
     const today = dayjs().startOf('day').toDate();
+    // linha acima para saber o dia de hj
     const isCurrentDay = dayjs(date).isSame(today);
 return(
         <TouchableOpacity 
-            className={clsx("rounded-l-xl border-2 m-1", {
+            className={clsx("rounded-lg border-2 m-1", {
                 ["bg-zinc-900 border-zinc-800"]: amountAccompplishedPercentage === 0,
                 ["bg-violet-900 border-violet-700"]:amountAccompplishedPercentage > 0 && amountAccompplishedPercentage < 20,
                 ["bg-violet-800 border-violet-600"]:amountAccompplishedPercentage > 20 && amountAccompplishedPercentage < 40,
