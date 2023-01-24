@@ -45,7 +45,7 @@ export function NewHaabitForm(){
                 type="text" 
                 id="title" 
                 placeholder="ex.: Exercicios, dormir bem, etc..." 
-                className="p-4 rounded-lg mt-3 bg-zinc-800 text-white placeholder:text-zinc-400"
+                className="p-4 rounded-lg mt-3 bg-zinc-800 text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 focus:ring-offset-zinc-900"
                 autoFocus
                 value={title}
                 onChange={event => setTitle(event.target.value)}
@@ -62,7 +62,7 @@ export function NewHaabitForm(){
                             checked={weekDays.includes(index)}
                             onCheckedChange={()=>{handleToogleWeekDay(index)}}
                         >
-                        <div className='h-8 w-8 rounded-lg flex items-center justify-center bg-zinc-900 border-2 border-zinc-800 group-data-[state=checked]:bg-green-500  group-data-[state=checked]:border-green-500'>
+                        <div className='h-8 w-8 rounded-lg flex items-center justify-center bg-zinc-900 border-2 border-zinc-800 group-data-[state=checked]:bg-green-500  group-data-[state=checked]:border-green-500 transition-colors'>
                             <Checkbox.Indicator className=''>
                             <Check size={20} className='text-white'/>
                             </Checkbox.Indicator>
@@ -76,7 +76,7 @@ export function NewHaabitForm(){
                 })}
             </div>
 
-            <button onClick={createNewHaabit} type="submit" className="mt-6 rounded-lg p-4 justify-center flex items-center gap-3 font-semibold bg-green-600 hover:bg-green-500">
+            <button onClick={createNewHaabit} type="submit" className="mt-6 rounded-lg p-4 justify-center flex items-center gap-3 font-semibold bg-green-600 hover:bg-green-500 transition-colors">
                 <Check size={20} width='bold'/>
                 Confirmar
             </button>
