@@ -1,32 +1,87 @@
-import { ScrollView, View } from "react-native";
+import { Alert, ScrollView, View } from "react-native";
 import { Text } from "react-native";
 import { useRoute } from "@react-navigation/native";
 import dayjs from "dayjs";
 import { BackButton } from "../components/BackButton";
 import { ProgressBar } from "../components/ProgressBar";
 import { ChechBox } from "../components/ChechBox";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { api } from "../lib/axios";
+import { Loading } from "../components/Loading";
+import { generateProgressPercentage } from "../utils/generate-progress-percentage";
+import { HabitsEmpty } from "../components/HabitsEmpty";
+import clsx from "clsx";
+
 
 
 interface Params{
     date: string;
 }
 
+interface DayInfoProps{
+    completedHabits : string[];
+    possibleHabits: {
+        id: string;
+        title: string;
+    }[];
+}
+
+
+
 export function Habit(){
+    const [loading, setLoading] = useState(true)
+    const [dayInfo, setDayInfo] = useState<DayInfoProps | null>(null)
+    const [completedHabits, setCompletedHabits] = useState<string[]>([])
+    const habitsProgress = dayInfo?.possibleHabits.length ? generateProgressPercentage(dayInfo.possibleHabits.length, completedHabits.length): 0
+    
     const route = useRoute();
     const {date} = route.params as Params;
 
     const parsedDate = dayjs(date)
+    const isDateInPast =parsedDate.endOf('day').isBefore(new Date());
     const dayOfWeek = parsedDate.format('dddd');
     const dayAndMonth =parsedDate.format('DD/MM');
 
-    const [chech, setChech] = useState<boolean>(false)
+    async function fetchHabits() {
+        try {
+            setLoading(true)
 
-    const handleclick =(index:number)=>{
-        chech? setChech(false) : setChech(true)
+            const response = await api.get('/day', {params: {date}});
+            setDayInfo(response.data)
+            setCompletedHabits(response.data.completedHabits)
+
+        } catch (error) {
+            console.log(error);
+            Alert.alert("Ops", "Não foi possivel carregar as informações")
+        }finally{
+            setLoading(false)
+        }
     }
 
-    const marcados =['1', '2', '3', '4', '5']
+    async function handleToogleHabits(habitId: string) {
+        try {
+            await api.patch(`/habits/${habitId}/toggle`);
+            if(completedHabits.includes(habitId)){
+                setCompletedHabits(prevState => prevState.filter(habit => habit !== habitId));
+            }else{
+                setCompletedHabits(prevState => [...prevState, habitId]);
+            }
+        } catch (error) {
+            console.log(error)
+            Alert.alert('Ops','Nao foi possivel atualizar o status do habito')
+        }
+        
+    }
+
+    useEffect(()=>{
+        fetchHabits();
+    },[])
+
+    if(loading){
+        return(
+            <Loading/>
+        )
+    }
 
 
     return(
@@ -43,25 +98,32 @@ export function Habit(){
                 <Text className="mt-6 text-white font-extrabold text-3xl">
                     {dayAndMonth}
                 </Text>
-                <ProgressBar progress={80} />
+                <ProgressBar progress={habitsProgress} />
 
-                <View className="mt-6">
+                <View className={clsx("mt-6", {
+                    ["opacity-50"]: isDateInPast
+                })}>
                     {
-                        marcados.map((marc, index)=>(
+                        dayInfo?.possibleHabits ? 
+                            dayInfo?.possibleHabits.map(habit =>(
                             <ChechBox 
-                                key={index}
-                                title="Beber 2l de agua" 
-                                onPress={()=>handleclick(index)} 
-                                checked={chech}
-                                
+                                key={habit.id}
+                                title={habit.title} 
+                                checked={completedHabits.includes(habit.id)}
+                                disabled={isDateInPast}
+                                onPress={()=> handleToogleHabits(habit.id)}
                             />
                         ))
+                        : <HabitsEmpty/>
                     }
-                    {/* 
-                    <ChechBox title="Beber 2l de agua"
-                        
-                    /> */}
                 </View>
+                {
+                    isDateInPast && (
+                        <Text className="text-white mt-10 text-center">
+                            Voce nao pode editar um habito de uma data passada.
+                        </Text>
+                    )
+                }
              </ScrollView>
             
         </View>
